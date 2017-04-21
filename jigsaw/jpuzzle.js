@@ -94,6 +94,12 @@ $(document).ready(function(){
     var movingPieces = new Array(); //An array to store moving elements
     var mousePiece = null; //The puzzle piece currently selected by the user's mouse
 
+    var allElem = document.getElementsByTagName("*");
+
+    for (var i = 0; i < allElem.length; i++) {
+        if (allElem[i].className == "pieces") movingPieces.push(allElem[i]);
+    }
+
     var  keyPiece  =  null; //The puzzle piece currently selected by the user's keyboard
     var  keyIndex  =  null; //The index number of keyPiece
     var  selectMode  =  true; //A Boolean value where true = keyboard use is in Select Piece mode, false = keyboard use is in Move Piece mode
@@ -125,7 +131,6 @@ $(document).ready(function(){
        for (var i = 0; i < allElem.length; i++) {
           if (allElem[i].className == "grid") grids.push(allElem[i]);
           if (allElem[i].className == "pieces") pieces.push(allElem[i]);
-          if (allElem[i].className == "pieces") movingPieces.push(allElem[i]);
        }
 
        var randomIntegers = randomArray(pieces.length);
@@ -153,7 +158,7 @@ $(document).ready(function(){
        keyIndex  =  0;
 
        //Must instantiate pieces before calling animateDiv().
-       //animateDiv();
+       animateDiv();
     }
 
 
@@ -212,6 +217,7 @@ $(document).ready(function(){
                         count++;
                         if(count == 25) {
                             console.log("YOU FINISHED THE PUZZLE");
+                            alert("YOU FINISHED THE PUZZLE");
                         }
                     }
                 }
@@ -251,7 +257,11 @@ $(document).ready(function(){
     function mouseGrab(e) {
        var evt = e|| window.event;
        mousePiece = evt.target || evt.srcElement;
-
+       $(mousePiece).stop();
+       var index = movingPieces.indexOf(mousePiece);
+       movingPieces.slice(index, 1);
+       console.log(movingPieces);
+       console.log(index);
        maxZ ++;
 
        mousePiece.style.zIndex = maxZ; // Place the piece above other objects
@@ -278,7 +288,7 @@ $(document).ready(function(){
 
        var  mouseX  =  evt.clientX;
        var  mouseY  =  evt.clientY;
-
+       $(mousePiece).stop();
        mousePiece.style.left  =  mouseX  +  diffX  +  "px";
        mousePiece.style.top  =  mouseY  +  diffY  +  "px";
        highlightGrid(mousePiece);
@@ -308,8 +318,8 @@ $(document).ready(function(){
     function makeNewPosition(){
 
         // Get viewport dimensions (remove the dimension of the div (50x50))
-        var h = $(window).height() - 250;
-        var w = $(window).width() - 150;
+        var h = $(window).height() - 450;
+        var w = $(window).width() - 250;
 
         var nh = Math.floor(Math.random() * h);
         var nw = Math.floor(Math.random() * w);
@@ -322,24 +332,24 @@ $(document).ready(function(){
             set new position from makeNewPosition
             set old position equal to the coordinates of the element relative to the document
      */
-    function animateDiv(){
+    function
+    animateDiv(){
 
         //Loop through each piece and assign a random new position
         if(movingPieces.length > 0) {
-            for(var i = 0; i < pieces.length; i++) {
+            for(var i = 0; i < movingPieces.length; i++) {
                 var newq = makeNewPosition();
                 var oldq = $(movingPieces[i]).offset();
                 var speed = calcSpeed([oldq.top, oldq.left], newq);
-
-                //Check if stopMove class is assigned or not
-                var element = document.getElementById("piece" + i);
-
                 //console.log(pieces[i]);
-                if(movingPieces[i] != null) {
-                    $(movingPieces[i]).animate({ top: newq[0], left: newq[1] }, speed, function(){
-                        animateDiv();
-                    });
+                for(var j = 0; j < grids.length; j++){
+                    if(pieces[i].style.left == grids[j].style.left && movingPieces[i].style.top == grids[j].style.top) {
+                        $(movingPieces[i]).stop();
+                    }
                 }
+                $(movingPieces[i]).animate({ top: newq[0], left: newq[1] }, speed, function(){
+                    animateDiv();
+                });
             }
         }
     };
