@@ -87,11 +87,10 @@
 
 $(document).ready(function(){
 
-    var canMove = true;
-
     var grids = new Array(); //An array of elements belonging to the grid class
     var pieces = new Array(); //An array of elements belonging to the pieces class
     var movingPieces = new Array(); //An array to store moving elements
+    var stoppedPieces = new Array();
     var mousePiece = null; //The puzzle piece currently selected by the user's mouse
 
     var allElem = document.getElementsByTagName("*");
@@ -216,7 +215,6 @@ $(document).ready(function(){
                     if(imagePiece.style.left == gridPiece.style.left && imagePiece.style.top == gridPiece.style.top) {
                         count++;
                         if(count == 25) {
-                            console.log("YOU FINISHED THE PUZZLE");
                             alert("YOU FINISHED THE PUZZLE");
                         }
                     }
@@ -255,14 +253,21 @@ $(document).ready(function(){
           the value of diffX and diffY. Applies event handlers for mousemove and mouseup events
     */
     function mouseGrab(e) {
+        console.log("mouseGrab");
        var evt = e|| window.event;
        mousePiece = evt.target || evt.srcElement;
-       $(mousePiece).stop();
-       var index = movingPieces.indexOf(mousePiece);
-       movingPieces.slice(index, 1);
-       console.log(movingPieces);
-       console.log(index);
        maxZ ++;
+
+       //Remove piece from array and stop animation
+        $(mousePiece).stop();
+        var index = movingPieces.indexOf(mousePiece);
+        movingPieces.splice(index, 1);
+        console.log(movingPieces);
+        $(mousePiece).stop();
+
+        //Loop through an array with all removed pieces and assign a stop() to them
+        // I think the updating of the animate array is a bit slow so it doesn't always apply when you click the piece
+        stoppedPieces.push(mousePiece);
 
        mousePiece.style.zIndex = maxZ; // Place the piece above other objects
 
@@ -332,26 +337,39 @@ $(document).ready(function(){
             set new position from makeNewPosition
             set old position equal to the coordinates of the element relative to the document
      */
-    function
-    animateDiv(){
-
+    function animateDiv(){
         //Loop through each piece and assign a random new position
-        if(movingPieces.length > 0) {
             for(var i = 0; i < movingPieces.length; i++) {
+                //var currentPiece = movingPieces[i];
+                /*
+                 For each piece we grab, compare it's position to all grid positions
+                 if it's on a grid then stop the animation and slice it from the array to
+                 stop further animations to run
+                 */
+
+                /*
+                for(var j = 0; j < grids.length; j++){
+                    if(currentPiece.style.left == grids[j].style.left && currentPiece.style.top == grids[j].style.top) {
+                        var index = movingPieces.indexOf(currentPiece);
+                        //movingPieces.splice(index, index+1);
+                        //stoppedPieces.push(element);
+                        console.log(movingPieces);
+                        console.log(index);
+                        console.log("That's true!");
+                        //$(currentPiece).stop();
+                    }
+                }
+                */
+
                 var newq = makeNewPosition();
                 var oldq = $(movingPieces[i]).offset();
                 var speed = calcSpeed([oldq.top, oldq.left], newq);
-                //console.log(pieces[i]);
-                for(var j = 0; j < grids.length; j++){
-                    if(pieces[i].style.left == grids[j].style.left && movingPieces[i].style.top == grids[j].style.top) {
-                        $(movingPieces[i]).stop();
-                    }
-                }
+
+                //Loop through all pieces and animate them
                 $(movingPieces[i]).animate({ top: newq[0], left: newq[1] }, speed, function(){
                     animateDiv();
                 });
             }
-        }
     };
 
     /*calcSpeed(prevv, next)
