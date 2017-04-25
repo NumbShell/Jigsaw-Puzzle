@@ -259,11 +259,10 @@ $(document).ready(function(){
        maxZ ++;
 
        //Remove piece from array and stop animation
-        $(mousePiece).stop();
+        $(mousePiece).stop(true);
         var index = movingPieces.indexOf(mousePiece);
         movingPieces.splice(index, 1);
         console.log(movingPieces);
-        $(mousePiece).stop();
 
         //Loop through an array with all removed pieces and assign a stop() to them
         // I think the updating of the animate array is a bit slow so it doesn't always apply when you click the piece
@@ -293,7 +292,7 @@ $(document).ready(function(){
 
        var  mouseX  =  evt.clientX;
        var  mouseY  =  evt.clientY;
-       $(mousePiece).stop();
+       $(mousePiece).stop(true);
        mousePiece.style.left  =  mouseX  +  diffX  +  "px";
        mousePiece.style.top  =  mouseY  +  diffY  +  "px";
        highlightGrid(mousePiece);
